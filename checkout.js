@@ -110,36 +110,36 @@ $(document).ready(function() {
                 // now, we place the order on adx
                 var billingInfo = {
 
-                    email: self.billingEmail().trim(),
+                    email: self.billingEmail(),
                 };
                 if (self.billingSameAsShipping()) {
-                    self.billingAddressLine1(self.shippingAddressLine1().trim());
+                    self.billingAddressLine1(self.shippingAddressLine1();
                     self.billingAddressLine2(self.shippingAddressLine2());
-                    self.billingCity(self.shippingCity().trim());
+                    self.billingCity(self.shippingCity();
                     self.billingState(self.shippingState());
-                    self.billingZipCode(self.shippingZipCode().trim());
+                    self.billingZipCode(self.shippingZipCode();
                 }
 
                 var order = {
                     product: self.productId(),
                     quantity: self.quantity(),
-                    firstName: self.firstName().trim(),
-                    lastName: self.lastName().trim(),
-                    email: self.email().trim(),
+                    firstName: self.firstName(),
+                    lastName: self.lastName(),
+                    email: self.email(),
                     shippingAddress: {
-                        addressLine1: self.shippingAddressLine1().trim(),
+                        addressLine1: self.shippingAddressLine1(),
                         addressLine2: self.shippingAddressLine2(),
-                        city: self.shippingCity().trim(),
+                        city: self.shippingCity(),
                         state: self.shippingState(),
-                        zipCode: self.shippingZipCode().trim()
+                        zipCode: self.shippingZipCode()
                     },
                     billingAddress: {
-                        email: self.billingEmail().trim(),
-                        addressLine1: self.billingAddressLine1().trim(),
+                        email: self.billingEmail(),
+                        addressLine1: self.billingAddressLine1(),
                         addressLine2: self.billingAddressLine2(),
-                        city: self.billingCity().trim(),
+                        city: self.billingCity(),
                         state: self.billingState(),
-                        zipCode: self.billingZipCode().trim()
+                        zipCode: self.billingZipCode()
                     },
                     paymentIntentId: paymentIntent.id
                 };
