@@ -112,7 +112,7 @@ $(document).ready(function() {
 
                     email: self.billingEmail().trim(),
                 };
-                if (!self.sameAddress()) {
+                if (!self.billingSameAsShipping()) {
                     self.billingAddressLine1(self.shippingAddressLine1().trim());
                     self.billingAddressLine2(self.shippingAddressLine2());
                     self.billingCity(self.shippingCity().trim());
