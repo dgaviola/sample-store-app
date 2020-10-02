@@ -115,9 +115,9 @@ $(document).ready(function() {
                 if (self.billingSameAsShipping()) {
                     self.billingAddressLine1(self.shippingAddressLine1());
                     self.billingAddressLine2(self.shippingAddressLine2());
-                    self.billingCity(self.shippingCity();
+                    self.billingCity(self.shippingCity());
                     self.billingState(self.shippingState());
-                    self.billingZipCode(self.shippingZipCode();
+                    self.billingZipCode(self.shippingZipCode());
                 }
 
                 var order = {
