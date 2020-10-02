@@ -55,7 +55,7 @@ $(document).ready(function() {
             sys.ws.put('/data/orders/quote', {
                 product: self.productId(),
                 quantity: self.quantity(),
-                zipCode: self.billingZipCode(),
+                zipCode: self.billingSameAsShipping() ? self.shippingZipCode() : self.billingZipCode(),
                 createPaymentIntent: true
             }, function (res) {
                 self.paymentIntentClientSecret = res.paymentIntent.clientSecret;
@@ -114,11 +114,11 @@ $(document).ready(function() {
                     email: self.billingEmail().trim(),
                 };
                 if (!self.sameAddress()) {
-                    billingInfo.addressLine1 = self.billing.addressLine1().trim();
-                    billingInfo.addressLine2 = self.billing.addressLine2();
-                    billingInfo.city = self.billing.city().trim();
-                    billingInfo.state = self.billing.state();
-                    billingInfo.zipCode = self.billing.zipCode().trim();
+                    self.billingAddressLine1(self.shippingAddressLine1().trim());
+                    self.billingAddressLine2(self.shippingAddressLine2());
+                    self.billingCity(self.shippingCity().trim());
+                    self.billingState(self.shippingState());
+                    self.billingZipCode(self.shippingZipCode().trim());
                 }
 
                 var order = {
