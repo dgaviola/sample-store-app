@@ -134,7 +134,7 @@ $(document).ready(function() {
                         zipCode: self.shippingZipCode().trim()
                     },
                     billingAddress: {
-                        email: self.billingEmail(),
+                        email: self.billingEmail().trim(),
                         addressLine1: self.billingAddressLine1().trim(),
                         addressLine2: self.billingAddressLine2(),
                         city: self.billingCity().trim(),
@@ -159,7 +159,6 @@ $(document).ready(function() {
                         console.error(errorInfo);
                     }
                     self.submitting(false);
-                    self.showSubmit(false);
                 });
             } else if (paymentIntent.status == 'requires_payment_method') {
                 self.paymentError('Payment was not successful. Please, try again or contact support at support@addyourlabs.io');
