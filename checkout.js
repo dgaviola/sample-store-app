@@ -66,8 +66,7 @@ $(document).ready(function() {
                             name: self.billingNameOnCard(),
                             email: self.billingEmail()
                         }
-                    },
-                    return_url: STRIPE_3DS_REDIRECT
+                    }
                 };
                 if (!self.existingUser()) {
                     confirmData.setup_future_usage = 'on_session';
