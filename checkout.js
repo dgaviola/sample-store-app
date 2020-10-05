@@ -167,15 +167,11 @@ $(document).ready(function() {
                 quantity: quantity,
                 zipCode: zipCode
             }, function (res) {
-                if (res.exists) {
-                    self.subTotal(res.subTotal);
-                    self.shippingCost(res.shippingCost);
-                    self.total(res.total);
-                } else {
-                    self.existingUser(false);
-                }
+                self.subTotal(res.subTotal);
+                self.shippingCost(res.shippingCost);
+                self.total(res.total);
             }, function (errorInfo) {
-                console.error('Error checking customer email');
+                console.error('Error fetching quote');
                 console.error(errorInfo);
             });
         };
