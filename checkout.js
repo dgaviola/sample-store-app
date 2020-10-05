@@ -12,8 +12,10 @@ $(document).ready(function() {
         self.productPrice = ko.observable();
         self.productInfoEnabled = ko.observable(false);
         self.quantity = ko.observable(1);
+        self.subTotal = ko.observable(0);
+        self.shippingCost = ko.observable(0);
         self.total = ko.computed(function() {
-            return self.productPrice() * self.quantity();
+            return self.subTotal() * self.shippingCost();
         });
 
         self.firstName = ko.observable();
@@ -107,11 +109,6 @@ $(document).ready(function() {
                 self.paymentError('Validation did not succeed. Please, try again.');
                 self.submitting(false);
             } else if (paymentIntent.status === 'succeeded') {
-                // now, we place the order on adx
-                var billingInfo = {
-
-                    email: self.billingEmail(),
-                };
                 if (self.billingSameAsShipping()) {
                     self.billingAddressLine1(self.shippingAddressLine1());
                     self.billingAddressLine2(self.shippingAddressLine2());
@@ -166,6 +163,24 @@ $(document).ready(function() {
             }
         };
 
+        self.quote = function(quantity, zipCode) {
+            sys.ws.put('/data/orders/quote', {
+                product: self.productId(),
+                quantity: quantity,
+                zipCode: zipCode
+            }, function (res) {
+                if (res.exists) {
+                    self.subTotal(res.productPrice);
+                    self.shippingCost(res.shippingCost);
+                } else {
+                    self.existingUser(false);
+                }
+            }, function (errorInfo) {
+                console.error('Error checking customer email');
+                console.error(errorInfo);
+            });
+        };
+
         self.init = function() {
             self.email.subscribe(function (newValue) {
                 if (newValue) {
@@ -181,6 +196,13 @@ $(document).ready(function() {
                     });
                 }
             });
+            self.quantity.subscribe(function(newValue) {
+                self.quote(newValue, self.billingSameAsShipping() ? self.shippingZipCode() : self.billingZipCode());
+            });
+            self.shippingZipCode.subscribe(function(newValue) {
+                self.quote(self.quantity(), newValue);
+            });
+            self.quote(1, null);
 
             // init stripe
             var style = {
