@@ -14,9 +14,7 @@ $(document).ready(function() {
         self.quantity = ko.observable(1);
         self.subTotal = ko.observable(0);
         self.shippingCost = ko.observable(0);
-        self.total = ko.computed(function() {
-            return self.subTotal() * self.shippingCost();
-        });
+        self.total = ko.observable(0);
 
         self.firstName = ko.observable();
         self.lastName = ko.observable();
@@ -170,8 +168,9 @@ $(document).ready(function() {
                 zipCode: zipCode
             }, function (res) {
                 if (res.exists) {
-                    self.subTotal(res.productPrice);
+                    self.subTotal(res.subTotal);
                     self.shippingCost(res.shippingCost);
+                    self.total(res.total);
                 } else {
                     self.existingUser(false);
                 }
@@ -202,7 +201,6 @@ $(document).ready(function() {
             self.shippingZipCode.subscribe(function(newValue) {
                 self.quote(self.quantity(), newValue);
             });
-            self.quote(1, null);
 
             // init stripe
             var style = {
@@ -248,6 +246,7 @@ $(document).ready(function() {
                 console.error('Error fetching product');
                 console.error(errorInfo);
             });
+            self.quote(1, null);
         };
 
         return self;
