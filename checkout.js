@@ -41,6 +41,7 @@ $(document).ready(function() {
         self.card = null;
         self.paymentIntentClientSecret = null;
 
+        self.confirmText = ko.observable('Confirm Order');
         self.paymentError = ko.observable();
         self.generalError = ko.observable();
         self.submitting = ko.observable(false);
@@ -170,6 +171,7 @@ $(document).ready(function() {
                 self.subTotal(res.subTotal);
                 self.shippingCost(res.shippingCost);
                 self.total(res.total);
+                self.confirmText('Confirm Order ($'+res.total+')');
             }, function (errorInfo) {
                 console.error('Error fetching quote');
                 console.error(errorInfo);
