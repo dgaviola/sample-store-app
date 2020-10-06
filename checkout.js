@@ -12,9 +12,9 @@ $(document).ready(function() {
         self.productPrice = ko.observable();
         self.productInfoEnabled = ko.observable(false);
         self.quantity = ko.observable(1);
-        self.total = ko.computed(function() {
-            return self.productPrice() * self.quantity();
-        });
+        self.subTotal = ko.observable(0);
+        self.shippingCost = ko.observable(0);
+        self.total = ko.observable(0);
 
         self.firstName = ko.observable();
         self.lastName = ko.observable();
@@ -66,8 +66,7 @@ $(document).ready(function() {
                             name: self.billingNameOnCard(),
                             email: self.billingEmail()
                         }
-                    },
-                    return_url: STRIPE_3DS_REDIRECT
+                    }
                 };
                 if (!self.existingUser()) {
                     confirmData.setup_future_usage = 'on_session';
@@ -108,39 +107,34 @@ $(document).ready(function() {
                 self.paymentError('Validation did not succeed. Please, try again.');
                 self.submitting(false);
             } else if (paymentIntent.status === 'succeeded') {
-                // now, we place the order on adx
-                var billingInfo = {
-
-                    email: self.billingEmail().trim(),
-                };
-                if (!self.sameAddress()) {
-                    self.billingAddressLine1(self.shippingAddressLine1().trim());
+                if (self.billingSameAsShipping()) {
+                    self.billingAddressLine1(self.shippingAddressLine1());
                     self.billingAddressLine2(self.shippingAddressLine2());
-                    self.billingCity(self.shippingCity().trim());
+                    self.billingCity(self.shippingCity());
                     self.billingState(self.shippingState());
-                    self.billingZipCode(self.shippingZipCode().trim());
+                    self.billingZipCode(self.shippingZipCode());
                 }
 
                 var order = {
                     product: self.productId(),
                     quantity: self.quantity(),
-                    firstName: self.firstName().trim(),
-                    lastName: self.lastName().trim(),
-                    email: self.email().trim(),
+                    firstName: self.firstName(),
+                    lastName: self.lastName(),
+                    email: self.email(),
                     shippingAddress: {
-                        addressLine1: self.shippingAddressLine1().trim(),
+                        addressLine1: self.shippingAddressLine1(),
                         addressLine2: self.shippingAddressLine2(),
-                        city: self.shippingCity().trim(),
+                        city: self.shippingCity(),
                         state: self.shippingState(),
-                        zipCode: self.shippingZipCode().trim()
+                        zipCode: self.shippingZipCode()
                     },
                     billingAddress: {
                         email: self.billingEmail(),
-                        addressLine1: self.billingAddressLine1().trim(),
+                        addressLine1: self.billingAddressLine1(),
                         addressLine2: self.billingAddressLine2(),
-                        city: self.billingCity().trim(),
+                        city: self.billingCity(),
                         state: self.billingState(),
-                        zipCode: self.billingZipCode().trim()
+                        zipCode: self.billingZipCode()
                     },
                     paymentIntentId: paymentIntent.id
                 };
@@ -160,12 +154,26 @@ $(document).ready(function() {
                         console.error(errorInfo);
                     }
                     self.submitting(false);
-                    self.showSubmit(false);
                 });
             } else if (paymentIntent.status == 'requires_payment_method') {
                 self.paymentError('Payment was not successful. Please, try again or contact support at support@addyourlabs.io');
                 self.submitting(false);
             }
+        };
+
+        self.quote = function(quantity, zipCode) {
+            sys.ws.put('/data/orders/quote', {
+                product: self.productId(),
+                quantity: quantity,
+                zipCode: zipCode
+            }, function (res) {
+                self.subTotal(res.subTotal);
+                self.shippingCost(res.shippingCost);
+                self.total(res.total);
+            }, function (errorInfo) {
+                console.error('Error fetching quote');
+                console.error(errorInfo);
+            });
         };
 
         self.init = function() {
@@ -182,6 +190,12 @@ $(document).ready(function() {
                         console.error(errorInfo);
                     });
                 }
+            });
+            self.quantity.subscribe(function(newValue) {
+                self.quote(newValue, self.billingSameAsShipping() ? self.shippingZipCode() : self.billingZipCode());
+            });
+            self.shippingZipCode.subscribe(function(newValue) {
+                self.quote(self.quantity(), newValue);
             });
 
             // init stripe
@@ -228,6 +242,7 @@ $(document).ready(function() {
                 console.error('Error fetching product');
                 console.error(errorInfo);
             });
+            self.quote(1, null);
         };
 
         return self;
